@@ -1,55 +1,26 @@
 //Require packages
 const mongoose = require('mongoose');
-const Entry = require('../models/entry');
-const dateFormat = require('dateformat');
+const Admin = require('../models/admin');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-//GET request for all
-module.exports.post = async (req, res) => {
-    //Access date property
-    let date = req.body.date
 
-    //Convert date to string
-    date = date.toString();
-
-    //Format date
-    date = dateFormat(date, 'dddd, mmmm, dS, yyyy');
-
-    //Convert date back to array
-    date = date.split(", ");
-
-    //Declare new entry
-    const entry = new Entry({
+module.exports.admin = async (req, res) => {
+    const hash = await bcrypt.hash(req.body.password, 10);
+    //Declare new admin
+    const admin = new Admin({
         _id: mongoose.Types.ObjectId(),
-        title: req.body.title,
-        author: req.body.author,
-        date: {
-            initial: req.body.date,
-            year: req.body.date[0],
-            month: {
-                default: req.body.date[1],
-                formated: [date[1]]
-            },
-            day: {
-                default: req.body.date[2],
-                formated: [date[0], date[2]]
-            }
-        },
-        time: {
-            initial: req.body.time,
-            set: req.body.time
-        },
-        tags: req.body.tags,
-        type: req.body.type,
-        data: { preview: req.body.data.preview, body: req.body.data.body }
+        username: req.body.username,
+        password: hash
     });
-    //Save new entry to DB
-    entry
+    //Save new admin to DB
+    admin
         .save()
         .then((result) => {
             //Send status code 200 and json data
             res.status(200).json({
-                message: 'Handling POST requests to /products/',
-                data: entry
+                message: 'Handling POST requests to /admin/',
+                data: admin
             });
         })
         .catch((error) => {
@@ -57,4 +28,29 @@ module.exports.post = async (req, res) => {
                 error: error
             });
         });
-};
+}
+
+module.exports.admin_login = async (req, res) => {
+    try {
+
+        const admin = await Admin.findOne({ username: req.body.username }).exec();
+        console.log(admin)
+        const result = await bcrypt.compare(req.body.password, admin.password);
+        if (result) {
+            const token = jwt.sign({ id: admin._id, username: admin.username }, 'shhhhh');
+            res.status(200).json({
+                message: 'Handling POST requests to /admin/',
+                token: token
+            });
+        } else {
+            res.status(401).json({
+                message: 'error'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            error: error
+        });
+
+    };
+}

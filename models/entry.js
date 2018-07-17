@@ -27,7 +27,8 @@ const postSchema = mongoose.Schema({
     data: {
         preview: String,
         body: String
-    }
+    },
+    archived: Boolean
 });
 
 module.exports = mongoose.model('Entry', postSchema);
