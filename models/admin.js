@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const adminSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     username: String,
-    password: String
+    password: String,
+    active: Boolean
 });
 
 module.exports = mongoose.model('Admin', adminSchema);

@@ -6,7 +6,7 @@ const dateFormat = require('dateformat');
 /******************************************************/
 
 //Create new post
-module.exports.post = async (req, res) => {
+module.exports.create = async (req, res) => {
     //Access date property
     let date = req.body.date
 
@@ -65,7 +65,7 @@ module.exports.post = async (req, res) => {
 /******************************************************/
 
 //PUT requst for entrys by id
-module.exports.put_by_id = async (req, res) => {
+module.exports.update_id = async (req, res) => {
     //Select Entry and pass new data
     Entry.findByIdAndUpdate(req.params.id, req.body, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
@@ -75,7 +75,7 @@ module.exports.put_by_id = async (req, res) => {
 };
 
 //PUT requst for entrys by title
-module.exports.put_by_title = async (req, res) => {
+module.exports.update_title = async (req, res) => {
     // Select Entry and pass new data
     Entry.findOneAndUpdate(req.params.title, req.body, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
@@ -87,7 +87,7 @@ module.exports.put_by_title = async (req, res) => {
 /******************************************************/
 
 //GET request for all
-module.exports.get_all = async (req, res) => {
+module.exports.retrieve = async (req, res) => {
     //Retrieve all documents in DB
     Entry.find({})
         .exec()
@@ -105,7 +105,7 @@ module.exports.get_all = async (req, res) => {
 };
 
 //GET request for all
-module.exports.get_all_archived = async (req, res) => {
+module.exports.retrieve_archived = async (req, res) => {
     //Retrieve all documents in DB
     Entry.find({ archived: true })
         .exec()
@@ -123,7 +123,7 @@ module.exports.get_all_archived = async (req, res) => {
 };
 
 //GET single by id
-module.exports.get_by_id = async (req, res) => {
+module.exports.retrieve_id = async (req, res) => {
     //Retrieve only documents matching the specified ID
     Entry.findById(req.params.id)
         .exec()
@@ -141,7 +141,7 @@ module.exports.get_by_id = async (req, res) => {
 };
 
 //GET all by title
-module.exports.get_by_title = async (req, res) => {
+module.exports.retrieve_title = async (req, res) => {
     //Retrieve only documents matching the specified TITLE    
     Entry.find({ title: req.params.title })
         .then((result) => {
@@ -158,7 +158,7 @@ module.exports.get_by_title = async (req, res) => {
 };
 
 //GET all by author
-module.exports.get_by_author = async (req, res) => {
+module.exports.retrieve_author = async (req, res) => {
     //Retrieve only documents matching the specified AUTHOR
     Entry.find({ author: req.params.author })
         .then((result) => {
@@ -175,7 +175,7 @@ module.exports.get_by_author = async (req, res) => {
 };
 
 //GET all by year
-module.exports.get_by_date_year = async (req, res) => {
+module.exports.retrieve_year = async (req, res) => {
     // Retrieve only documents matching the specified YEAR
     Entry.find({ 'date.year': req.params.year })
         .then((result) => {
@@ -192,7 +192,7 @@ module.exports.get_by_date_year = async (req, res) => {
 }
 
 //GET all by month
-module.exports.get_by_date_month = async (req, res) => {
+module.exports.retrieve_month = async (req, res) => {
     const month = req.params.month;
     //Check if month is a number
     if (isNaN(month)) {
@@ -227,7 +227,7 @@ module.exports.get_by_date_month = async (req, res) => {
 }
 
 //GET all by day
-module.exports.get_by_date_day = async (req, res) => {
+module.exports.retrieve_day = async (req, res) => {
     const day = req.params.day;
     //Check if day is a number
     if (isNaN(day)) {
@@ -262,7 +262,7 @@ module.exports.get_by_date_day = async (req, res) => {
 }
 
 //GET all by TYPE
-module.exports.get_by_type = async (req, res) => {
+module.exports.retrieve_type = async (req, res) => {
     //Retrieve only documents matching the specified TYPE    
     Entry.find({ type: req.params.type })
         .then((result) => {
@@ -279,7 +279,7 @@ module.exports.get_by_type = async (req, res) => {
 }
 
 //GET all by tag
-module.exports.get_by_tag = async (req, res) => {
+module.exports.retrieve_tag = async (req, res) => {
     //Retrieve only documents matching the specified tag
     Entry.find({ tags: req.params.tag })
         .then((result) => {
@@ -298,7 +298,7 @@ module.exports.get_by_tag = async (req, res) => {
 /***********************************************************/
 
 //DELETE request for all
-module.exports.delete_all = async (req, res) => {
+module.exports.remove = async (req, res) => {
     //Remove all documents from DB
     Entry.remove((error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
@@ -308,7 +308,7 @@ module.exports.delete_all = async (req, res) => {
 };
 
 //DELETE request for entrys by id
-module.exports.delete_by_id = async (req, res) => {
+module.exports.remove_id = async (req, res) => {
     //Remove all documents matching the specifed id
     Entry.findByIdAndRemove(req.params.id, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
@@ -318,7 +318,7 @@ module.exports.delete_by_id = async (req, res) => {
 };
 
 //DELETE request for entrys by title
-module.exports.delete_by_title = async (req, res) => {
+module.exports.remove_title = async (req, res) => {
     //Remove all documents matching the specifed title
     Entry.findOneAndRemove(req.params.title, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
@@ -328,21 +328,11 @@ module.exports.delete_by_title = async (req, res) => {
 }
 
 //DELETE request for entrys by author
-module.exports.delete_by_author = async (req, res) => {
+module.exports.remove_author = async (req, res) => {
     //Remove all documents matching the specifed author
     Entry.deleteMany({ author: req.params.author }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
         if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/:author', data: result });
-        return res.status(404).json({ data: "Nothing is removed" });
-    });
-}
-
-//DELETE request for entrys by type
-module.exports.delete_by_type = async (req, res) => {
-    //Remove all documents matching the specifed type
-    Entry.deleteMany({ type: req.params.type }, (error, result) => {
-        if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/:date', data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 }

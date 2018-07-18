@@ -2,68 +2,65 @@
 const router = require('express').Router();
 
 //Require controllers
-const post = require('../controllers/post');
+const entryController = require('../controllers/entry');
 
 /*********************************************/
 
 //Create new post
-router.post('/new_post', post.create_post)
+router.post('/create', entryController.create);
 
 /*********************************************/
 
 //GET request for all entrys for user control
-router.get('/', getController.get_all);
+router.get('/retrieve', entryController.retrieve);
 
-//GET request for all entrys for user control
-router.get('/archived', getController.get_all_archived);
+// //GET request for all entrys for user control
+router.get('/retrieve_archived', entryController.retrieve_archived);
 
-//GET request for entrys by title
-router.get('/title/:title', getController.get_by_title);
+// //GET request for entrys by title
+router.get('/retrieve_title/:title', entryController.retrieve_title);
 
-//GET request for entrys by id
-router.get('/id/:id', getController.get_by_id);
+// //GET request for entrys by id
+router.get('/retrieve_id/:id', entryController.retrieve_id);
 
-//GET request for entrys by author
-router.get('/author/:author', getController.get_by_author);
+// //GET request for entrys by author
+router.get('/retrieve_author/:author', entryController.retrieve_author);
 
-//GET request for entrys by year
-router.get('/date/year/:year', getController.get_by_date_year);
+// //GET request for entrys by year
+router.get('/retrieve_year/:year', entryController.retrieve_year);
 
-//GET request for entrys by month
-router.get('/date/month/:month', getController.get_by_date_month);
+// //GET request for entrys by month
+router.get('/retrieve_month/:month', entryController.retrieve_month);
 
-//GET request for entrys by day
-router.get('/date/day/:day', getController.get_by_date_day);
+// //GET request for entrys by day
+router.get('/retrieve_date/day/:day', entryController.retrieve_day);
 
-//GET request for entrys by type
-router.get('/type/:type', getController.get_by_type);
+// //GET request for entrys by type
+router.get('/retrieve_type/:type', entryController.retrieve_type);
 
-//GET request for entrys by tag
-router.get('/tag/:tag', getController.get_by_tag);
+// //GET request for entrys by tag
+router.get('/retrieve_tag/:tag', entryController.retrieve_tag);
 
 /*********************************************/
 //Update post with id
-router.put('/id/:id', post.put_by_id);
+router.put('/update_id/:id', entryController.update_id);
 
 //Update post with title
-router.put('/title/:title', post.put_by_title);
+router.put('/update_title/:title', entryController.update_title);
 
 /*********************************************/
 
 //DELETE request for all entrys all
-router.delete('/', deleteController.delete_all);
+router.delete('/remove', entryController.remove);
 
 //DELETE request for entrys by id
-router.delete('/id/:id', deleteController.delete_by_id);
+router.delete('/remove_id/:id', entryController.remove_id);
 
 //GET request for entrys by title
-router.delete('/title/:title', deleteController.delete_by_title);
+router.delete('/remove_title/:title', entryController.remove_title);
 
 //GET request for entrys by author
-router.delete('/author/:author', deleteController.delete_by_author);
-
-//GET request for entrys by type
-router.delete('/type/:type', deleteController.delete_by_type);
+router.delete('/remove_author/:author', entryController.remove_author);
 
 /**********************************************/
 

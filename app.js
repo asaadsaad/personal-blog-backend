@@ -6,7 +6,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 
 //Require routes
-const entry = require('./routes/post');
+const entry = require('./routes/entry');
+const admin = require('./routes/admin');
 
 //Require middleware
 const auth = require('./middleware/auth')
@@ -37,10 +38,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //Use auth middleware
-app.use(auth);
+// app.use(auth);
 
 //Setup routes
 app.use('/entry', entry);
+app.use('/admin', admin);
 
 //Handle errors
 app.use((req, res, next) => {
