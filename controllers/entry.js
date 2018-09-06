@@ -8,16 +8,16 @@ const dateFormat = require('dateformat');
 //Create new post
 module.exports.create = async (req, res) => {
     //Access date property
-    let date = req.body.date
+    const year = req.body.date.split(" ")[0];
+    const initialDate = req.body.date;
+    const initialMonth = req.body.date.split(" ")[2];
+    const initialDay = req.body.date.split(" ")[4];
 
-    //Convert date to string
-    date = date.toString();
-
-    //Format date
-    date = dateFormat(date, 'dddd, mmmm, dS, yyyy');
-
-    //Convert date back to array
-    date = date.split(", ");
+    let formatedDate = req.body.date;
+    formatedDate = formatedDate.replace(/\s/g, '');
+    formatedDate = dateFormat(formatedDate, 'dddd, mmmm, dS, yyyy');
+    formatedDate = formatedDate.replace(/,/g, '');
+    formatedDate = formatedDate.split(" ");
 
     //Declare new entry
     const entry = new Entry({
@@ -25,20 +25,24 @@ module.exports.create = async (req, res) => {
         title: req.body.title,
         author: req.body.author,
         date: {
-            initial: req.body.date,
-            year: req.body.date[0],
-            month: {
-                default: req.body.date[1],
-                formated: [date[1]]
+            year: year,
+            initial: {
+                full: initialDate,
+                month: initialMonth,
+                day: initialDay
             },
-            day: {
-                default: req.body.date[2],
-                formated: [date[0], date[2]]
+            formated: {
+                full: formatedDate,
+                month: formatedDate[1],
+                day: {
+                    number: formatedDate[2],
+                    string: formatedDate[0]
+                }
             }
         },
         time: {
             initial: req.body.time,
-            set: req.body.time
+            updated: req.body.time
         },
         tags: req.body.tags,
         type: req.body.type,
@@ -67,9 +71,46 @@ module.exports.create = async (req, res) => {
 //PUT requst for entrys by id
 module.exports.update_id = async (req, res) => {
     //Select Entry and pass new data
-    Entry.findByIdAndUpdate(req.params.id, req.body, { new: true }, (error, result) => {
+
+    //Access date property
+    const year = req.body.date.split(" ")[0];
+    const initialDate = req.body.date;
+    const initialMonth = req.body.date.split(" ")[2];
+    const initialDay = req.body.date.split(" ")[4];
+
+    let formatedDate = req.body.date;
+    formatedDate = formatedDate.replace(/\s/g, '');
+    formatedDate = dateFormat(formatedDate, 'dddd, mmmm, dS, yyyy');
+    formatedDate = formatedDate.replace(/,/g, '');
+    formatedDate = formatedDate.split(" ");
+
+    const data = req.body;
+    delete data.date;
+
+    data.date = new Object();
+    data.date.initial = new Object();
+    data.date.formated = new Object();
+
+    data.date.formated.day = new Object();
+    data.date.formated.full = new Array();
+
+
+    data.date.initial.full = initialDate;
+    data.date.initial.month = initialMonth;
+    data.date.initial.day = initialDay;
+
+    data.date.formated.day.number = formatedDate[2];
+    data.date.formated.day.string = formatedDate[0];
+
+    data.date.formated.month = formatedDate[1];
+
+    data.date.year = year;
+
+    data.date.formated.full = formatedDate;
+
+    Entry.findByIdAndUpdate(req.params.id, data, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling PUT requests to /delete/', data: result });
+        if (result) return res.status(200).json({ message: `Handling PUT requests to /update_id/${req.params.id}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 };
@@ -77,9 +118,48 @@ module.exports.update_id = async (req, res) => {
 //PUT requst for entrys by title
 module.exports.update_title = async (req, res) => {
     // Select Entry and pass new data
-    Entry.findOneAndUpdate(req.params.title, req.body, { new: true }, (error, result) => {
+
+    //Access date property
+    const year = req.body.date.split(" ")[0];
+    const initialDate = req.body.date;
+    const initialMonth = req.body.date.split(" ")[2];
+    const initialDay = req.body.date.split(" ")[4];
+
+    let formatedDate = req.body.date;
+    formatedDate = formatedDate.replace(/\s/g, '');
+    formatedDate = dateFormat(formatedDate, 'dddd, mmmm, dS, yyyy');
+    formatedDate = formatedDate.replace(/,/g, '');
+    formatedDate = formatedDate.split(" ");
+
+    const data = req.body;
+    delete data.date;
+
+    data.date = new Object();
+    data.date.initial = new Object();
+    data.date.formated = new Object();
+
+    data.date.formated.day = new Object();
+    data.date.formated.full = new Array();
+
+
+    data.date.initial.full = initialDate;
+    data.date.initial.month = initialMonth;
+    data.date.initial.day = initialDay;
+
+    data.date.formated.day.number = formatedDate[2];
+    data.date.formated.day.string = formatedDate[0];
+
+    data.date.formated.month = formatedDate[1];
+
+    data.date.year = year;
+
+    data.date.formated.full = formatedDate;
+
+    console.log(req.params)
+
+    Entry.findOneAndUpdate(req.params.title, data, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/', data: result });
+        if (result) return res.status(200).json({ message: `Handling PUT requests to /update_title/${req.params.title}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 };
@@ -87,13 +167,13 @@ module.exports.update_title = async (req, res) => {
 /******************************************************/
 
 //GET request for all
-module.exports.retrieve = async (req, res) => {
+module.exports.retrieve_all = async (req, res) => {
     //Retrieve all documents in DB
     Entry.find({})
         .exec()
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/',
+                message: 'Handling GET requests to /get/retrieve_all',
                 data: result
             });
         })
@@ -106,12 +186,13 @@ module.exports.retrieve = async (req, res) => {
 
 //GET request for all
 module.exports.retrieve_archived = async (req, res) => {
+    console.log('test');
     //Retrieve all documents in DB
     Entry.find({ archived: true })
         .exec()
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/',
+                message: 'Handling GET requests to /get/retrieve_archived',
                 data: result
             });
         })
@@ -129,7 +210,7 @@ module.exports.retrieve_id = async (req, res) => {
         .exec()
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/:id',
+                message: `Handling GET requests to /get/${req.params.id}`,
                 data: [result]
             });
         })
@@ -146,7 +227,7 @@ module.exports.retrieve_title = async (req, res) => {
     Entry.find({ title: req.params.title })
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/',
+                message: `Handling GET requests to /get/retrieve_title/${req.params.title}`,
                 data: result
             });
         })
@@ -163,7 +244,7 @@ module.exports.retrieve_author = async (req, res) => {
     Entry.find({ author: req.params.author })
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/',
+                message: `Handling GET requests to /get/retrieve_author${req.params.author}`,
                 data: result
             });
         })
@@ -174,117 +255,127 @@ module.exports.retrieve_author = async (req, res) => {
         });
 };
 
-//GET all by year
-module.exports.retrieve_year = async (req, res) => {
-    // Retrieve only documents matching the specified YEAR
-    Entry.find({ 'date.year': req.params.year })
-        .then((result) => {
-            res.status(200).json({
-                message: 'Handling GET requests to /get/',
-                data: result
-            });
-        })
-        .catch((error) => {
-            res.status(500).json({
-                error: error
-            });
-        });
-}
+//GET all by year  || NOT IN USE
+// module.exports.retrieve_year = async (req, res) => {
+//     // Retrieve only documents matching the specified YEAR
+//     Entry.find({ 'date.year': req.params.year })
+//         .then((result) => {
+//             res.status(200).json({
+//                 message: 'Handling GET requests to /get/',
+//                 data: result
+//             });
+//         })
+//         .catch((error) => {
+//             res.status(500).json({
+//                 error: error
+//             });
+//         });
+// }
 
-//GET all by month
-module.exports.retrieve_month = async (req, res) => {
-    const month = req.params.month;
-    //Check if month is a number
-    if (isNaN(month)) {
-        // Retrieve only documents matching the specified MONTH
-        Entry.find({ 'date.month.formated': req.params.month })
-            .then((result) => {
-                res.status(200).json({
-                    message: 'Handling GET requests to /get/',
-                    data: result
-                });
-            })
-            .catch((error) => {
-                res.status(500).json({
-                    error: error
-                });
-            });
-    } else {
-        // Retrieve only documents matching the specified MONTH
-        Entry.find({ 'date.month.default': req.params.month })
-            .then((result) => {
-                res.status(200).json({
-                    message: 'Handling GET requests to /get/',
-                    data: result
-                });
-            })
-            .catch((error) => {
-                res.status(500).json({
-                    error: error
-                });
-            });
-    }
-}
+//GET all by month || NOT IN USE
+// module.exports.retrieve_month = async (req, res) => {
+//     let month = req.params.month;
+//     if (month.length < 3) parseInt(req.params.month);
+//     // Check if month is a number
+//     if (isNaN(month)) {
+//         //     // Retrieve only documents matching the specified MONTH
+//         Entry.find({ 'date.month.formated': month })
+//             .then((result) => {
+//                 res.status(200).json({
+//                     message: 'Handling GET requests to /get/',
+//                     data: result
+//                 });
+//             })
+//             .catch((error) => {
+//                 res.status(500).json({
+//                     error: error
+//                 });
+//             });
+//     } else {
+//         // Retrieve only documents matching the specified MONTH
+//         Entry.find({ 'date.month.default': month })
+//             .then((result) => {
+//                 res.status(200).json({
+//                     message: 'Handling GET requests to /get/',
+//                     data: result
+//                 });
+//             })
+//             .catch((error) => {
+//                 res.status(500).json({
+//                     error: error
+//                 });
+//             });
+//     }
+// }
 
-//GET all by day
-module.exports.retrieve_day = async (req, res) => {
-    const day = req.params.day;
-    //Check if day is a number
-    if (isNaN(day)) {
-        // Retrieve only documents matching the specified DAY
-        Entry.find({ 'date.day.formated[0]': req.params.daty })
-            .then((result) => {
-                res.status(200).json({
-                    message: 'Handling GET requests to /get/',
-                    data: result
-                });
-            })
-            .catch((error) => {
-                res.status(500).json({
-                    error: error
-                });
-            });
-    } else {
-        // Retrieve only documents matching the specified DAY
-        Entry.find({ 'date.day.default': req.params.day })
-            .then((result) => {
-                res.status(200).json({
-                    message: 'Handling GET requests to /get/',
-                    data: result
-                });
-            })
-            .catch((error) => {
-                res.status(500).json({
-                    error: error
-                });
-            });
-    }
-}
+//GET all by day || NOT IN USE
+// module.exports.retrieve_day = async (req, res) => {
+//     const day = req.params.day;
+//     //Check if day is a number
+//     if (isNaN(day)) {
+//         // Retrieve only documents matching the specified DAY
+//         Entry.find({ 'date.day.formated[0]': req.params.daty })
+//             .then((result) => {
+//                 res.status(200).json({
+//                     message: 'Handling GET requests to /get/',
+//                     data: result
+//                 });
+//             })
+//             .catch((error) => {
+//                 res.status(500).json({
+//                     error: error
+//                 });
+//             });
+//     } else {
+//         // Retrieve only documents matching the specified DAY
+//         Entry.find({ 'date.day.default': req.params.day })
+//             .then((result) => {
+//                 res.status(200).json({
+//                     message: 'Handling GET requests to /get/',
+//                     data: result
+//                 });
+//             })
+//             .catch((error) => {
+//                 res.status(500).json({
+//                     error: error
+//                 });
+//             });
+//     }
+// }
 
 //GET all by TYPE
 module.exports.retrieve_type = async (req, res) => {
-    //Retrieve only documents matching the specified TYPE    
-    Entry.find({ type: req.params.type })
-        .then((result) => {
-            res.status(200).json({
-                message: 'Handling GET requests to /get/',
-                data: result
+    //Retrieve only documents matching the specified TYPE
+    const type = req.params.type;
+    const type_blog = 'blog';
+    const type_project = 'project';
+    const type_tutorial = 'tutorial';
+
+    if (type === type_blog || type === type_project || type === type_tutorial) {
+        Entry.find({ type: req.params.type })
+            .then((result) => {
+                res.status(200).json({
+                    message: `Handling GET requests to /get/retrieve_type/${req.params.type}`,
+                    data: result
+                });
+            })
+            .catch((error) => {
+                res.status(500).json({
+                    error: error
+                });
             });
-        })
-        .catch((error) => {
-            res.status(500).json({
-                error: error
-            });
-        });
+    }
 }
 
 //GET all by tag
 module.exports.retrieve_tag = async (req, res) => {
-    //Retrieve only documents matching the specified tag
-    Entry.find({ tags: req.params.tag })
+    //Retrieve only documents matching a specified tag
+    let tag = req.params.tag;
+    tag = tag.toUpperCase();
+    Entry.find({ tags: tag })
         .then((result) => {
             res.status(200).json({
-                message: 'Handling GET requests to /get/',
+                message: `Handling GET requests to /get/${req.params.tag}`,
                 data: result
             });
         })
@@ -299,10 +390,11 @@ module.exports.retrieve_tag = async (req, res) => {
 
 //DELETE request for all
 module.exports.remove = async (req, res) => {
+    console.log('test');
     //Remove all documents from DB
     Entry.remove((error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/', data: result });
+        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /remove/', data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     })
 };
@@ -312,7 +404,7 @@ module.exports.remove_id = async (req, res) => {
     //Remove all documents matching the specifed id
     Entry.findByIdAndRemove(req.params.id, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/:id', data: result });
+        if (result) return res.status(200).json({ message: `Handling DELETE requests to /remove_id/${req.params.id}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 };
@@ -322,7 +414,7 @@ module.exports.remove_title = async (req, res) => {
     //Remove all documents matching the specifed title
     Entry.findOneAndRemove(req.params.title, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/:title', data: result });
+        if (result) return res.status(200).json({ message: `Handling DELETE requests to /remove_title/${req.params.title}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 }
@@ -332,7 +424,7 @@ module.exports.remove_author = async (req, res) => {
     //Remove all documents matching the specifed author
     Entry.deleteMany({ author: req.params.author }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({ message: 'Handling DELETE requests to /delete/:author', data: result });
+        if (result) return res.status(200).json({ message: `Handling DELETE requests to /remove_author/${req.params.title}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
     });
 }

@@ -6,43 +6,43 @@ const entryController = require('../controllers/entry');
 
 /*********************************************/
 
-//Create new post
+//Create new post || TESTED || WORKING
 router.post('/create', entryController.create);
 
 /*********************************************/
 
-//GET request for all entrys for user control
-router.get('/retrieve', entryController.retrieve);
+//GET request for all entrys for user control || TESTED || WORKING
+router.get('/retrieve_all', entryController.retrieve_all);
 
-// //GET request for all entrys for user control
+//GET request for all entrys for user control || TESTED || WORKING
 router.get('/retrieve_archived', entryController.retrieve_archived);
 
-// //GET request for entrys by title
+//GET request for entrys by title || TESTED || WORKING
 router.get('/retrieve_title/:title', entryController.retrieve_title);
 
-// //GET request for entrys by id
+//GET request for entrys by id || TESTED || WORKING
 router.get('/retrieve_id/:id', entryController.retrieve_id);
 
-// //GET request for entrys by author
+//GET request for entrys by author || TESTED || WORKING
 router.get('/retrieve_author/:author', entryController.retrieve_author);
 
-// //GET request for entrys by year
-router.get('/retrieve_year/:year', entryController.retrieve_year);
+//GET request for entrys by year || TESTED || WORKING
+// router.get('/retrieve_year/:year', entryController.retrieve_year);
 
-// //GET request for entrys by month
-router.get('/retrieve_month/:month', entryController.retrieve_month);
+//GET request for entrys by month
+// router.get('/retrieve_month/:month', entryController.retrieve_month);
 
-// //GET request for entrys by day
-router.get('/retrieve_date/day/:day', entryController.retrieve_day);
+//GET request for entrys by day
+// router.get('/retrieve_date/day/:day', entryController.retrieve_day);
 
-// //GET request for entrys by type
+//GET request for entrys by type || TESTED || WORKING
 router.get('/retrieve_type/:type', entryController.retrieve_type);
 
-// //GET request for entrys by tag
+//GET request for entrys by tag || TESTED || WORKING
 router.get('/retrieve_tag/:tag', entryController.retrieve_tag);
 
 /*********************************************/
-//Update post with id
+//Update post with id || TESTED || WORKING
 router.put('/update_id/:id', entryController.update_id);
 
 //Update post with title
