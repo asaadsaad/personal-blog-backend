@@ -4,26 +4,30 @@ const mongoose = require('mongoose');
 //Initilize new schema
 const postSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    title: Array,
+    title: String,
     author: String,
     date: {
-        initial: Array,
         year: String,
-        month: {
-            default: String,
-            formated: [String]
+        initial: {
+            full: Array,
+            month: String,
+            day: String
         },
-        day: {
-            default: String,
-            formated: [String, String]
+        formated: {
+            full: Array,
+            month: String,
+            day: {
+                number: String,
+                string: String
+            }
         }
     },
     time: {
-        initial: String,
-        set: String
+        initial: Array,
+        updated: Array || null
     },
     tags: Array,
-    type: String,
+    type: Number, //Eventually convert over to only string type
     data: {
         preview: String,
         body: String

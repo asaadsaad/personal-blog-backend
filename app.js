@@ -5,9 +5,13 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
+//Configure .ENV file
+require('dotenv').config()
+
 //Require routes
 const entry = require('./routes/entry');
 const admin = require('./routes/admin');
+const statistics = require('./routes/statistics');
 
 //Require middleware
 const auth = require('./middleware/auth')
@@ -23,7 +27,7 @@ app.disable('x-powered-by');
 
 //Connect to db
 mongoose
-    .connect('mongodb://admin:adminadmin0@ds125381.mlab.com:25381/admin-control', { useNewUrlParser: true })
+    .connect('mongodb://admin:admin1@ds147821.mlab.com:47821/blogbackend', { useNewUrlParser: true })
     .then(() => console.log('Connected successfully to MLAB server'))
     .catch((err) => console.log(`Error connecting to MLAB server : ${err}`));
 
@@ -43,6 +47,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //Setup routes
 app.use('/entry', entry);
 app.use('/admin', admin);
+app.use('/statistics', statistics);
 
 //Handle errors
 app.use((req, res, next) => {
