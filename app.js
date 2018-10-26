@@ -27,7 +27,7 @@ app.disable('x-powered-by');
 
 //Connect to db
 mongoose
-    .connect(process.env.DB_ADDRESS, { useNewUrlParser: true })
+    .connect('mongodb://admin:admin1@ds147821.mlab.com:47821/blogbackend', { useNewUrlParser: true })
     .then(() => console.log('Connected successfully to MLAB server'))
     .catch((err) => console.log(`Error connecting to MLAB server : ${err}`));
 

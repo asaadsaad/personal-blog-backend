@@ -9,12 +9,12 @@ const postSchema = mongoose.Schema({
     date: {
         year: String,
         initial: {
-            full: String,
+            full: Array,
             month: String,
             day: String
         },
         formated: {
-            full: [String, String, String, String],
+            full: Array,
             month: String,
             day: {
                 number: String,
@@ -23,11 +23,11 @@ const postSchema = mongoose.Schema({
         }
     },
     time: {
-        initial: String,
-        updated: String
+        initial: Array,
+        updated: Array || null
     },
     tags: Array,
-    type: String,
+    type: Number, //Eventually convert over to only string type
     data: {
         preview: String,
         body: String
