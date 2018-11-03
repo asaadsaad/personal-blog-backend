@@ -27,7 +27,7 @@ const postSchema = mongoose.Schema({
         updated: Array || null
     },
     tags: Array,
-    type: Number, //Eventually convert over to only string type
+    type: String, //Eventually convert over to only string type
     data: {
         preview: String,
         body: String

@@ -31,4 +31,8 @@
 		2. UPDATE_TITLE -> Update an entry by title
 		3. UPDATE_TUTORIAL_FIELD -> Update tutorial category
 		4. UPDATE_AUTHOR -> Update info about an author
-		5. 
+		
+
+	###GET REQUSTS :
+
+		1. RETRIEVE_TAGS -> Retrieve names all all tags in circulation

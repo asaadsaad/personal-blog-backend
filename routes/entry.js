@@ -4,6 +4,8 @@ const router = require('express').Router();
 //Require controllers
 const entryController = require('../controllers/entry');
 
+//DATES AREN'T PROPERLY UPDATED :<
+
 /*********************************************/
 
 //Create new post || TESTED || WORKING
@@ -48,8 +50,8 @@ router.get('/retrieve_tag/:tag', entryController.retrieve_tag);
 //Update post with id || TESTED || WORKING
 router.put('/update_by_id/:id', entryController.update_by_id);
 
-//Update post with title || TESTING || PENDING
-router.put('/update_title/:title', entryController.update_title);
+//Update post with title || TESTED || WORKING
+router.put('/update_by_title/:title', entryController.update_by_title);
 
 /*********************************************/
 

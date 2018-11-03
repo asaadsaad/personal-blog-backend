@@ -7,6 +7,9 @@ const dateFormat = require('dateformat');
 
 //Create new post
 module.exports.create = async (req, res) => {
+    //Setup variable to hold any errors
+    let error;
+
     //Access date property
     const year = req.body.date[0];
 
@@ -20,52 +23,88 @@ module.exports.create = async (req, res) => {
     //Convert formatedDate into array
     formatedDate = formatedDate.split(', ');
 
-    //Declare new entry
-    const entry = new Entry({
-        _id: mongoose.Types.ObjectId(),
-        title: req.body.title,
-        author: req.body.author,
-        date: {
-            year: year,
-            initial: {
-                full: initialDate,
-                month: initialMonth,
-                day: initialDay
-            },
-            full: req.body.date,
-            formated: {
-                full: formatedDate,
-                month: formatedDate[1],
-                day: {
-                    number: formatedDate[2],
-                    string: formatedDate[0]
+    //Store date info
+    const formatedDayNumber = formatedDate[2];
+    const formatedMonth = formatedDate[1];
+    const formatedDayString = formatedDate[0]
+
+    //Convert data to lowercase
+    const title = req.body.title.toLowerCase();
+    const author = req.body.author.toLowerCase();
+
+    //Convert form type
+    const type_blog = 'blog';
+    const type_project = 'project';
+    const type_tutorial = 'tutorial';
+
+    const entered_type = req.body.type;
+    let type;
+
+    //Convert number to string
+    if (entered_type >= 1 && entered_type <= 3) {
+        if (entered_type === 1) type = type_blog;
+        else if (entered_type === 2) type = type_project;
+        else if (entered_type === 3) type = type_tutorial;
+    } else {
+        error = true;
+    }
+
+    //Format all tags
+    const formatedTags = req.body.tags.map(tag => tag.toLowerCase());
+
+    //If no errors are present
+    if (!error) {
+        //Declare new entry
+        const entry = new Entry({
+            _id: mongoose.Types.ObjectId(),
+            title: title,
+            author: author,
+            date: {
+                year: year,
+                initial: {
+                    full: initialDate,
+                    month: initialMonth,
+                    day: initialDay
+                },
+                full: req.body.date,
+                formated: {
+                    full: formatedDate,
+                    month: formatedMonth,
+                    day: {
+                        number: formatedDayNumber,
+                        string: formatedDayString
+                    }
                 }
-            }
-        },
-        time: {
-            initial: req.body.time,
-            updated: null
-        },
-        tags: req.body.tags,
-        type: req.body.type,
-        data: { preview: req.body.data.preview, body: req.body.data.body },
-        archived: req.body.archived
-    });
-    //Save new entry to DB
-    entry
-        .save()
-        .then((result) => {
-            //Send status code 200 and json data
-            res.status(200).json({
-                message: 'Handling POST requests to /create/',
-                data: entry
-            });
-        })
-        .catch((error) => {
-            res.status(500).json({
-                error: error
-            });
+            },
+            time: {
+                initial: req.body.time,
+                updated: null
+            },
+            tags: formatedTags,
+            type: type,
+            data: { preview: req.body.data.preview, body: req.body.data.body },
+            archived: req.body.archived
         });
+        //Save new entry to DB
+        entry
+            .save()
+            .then((result) => {
+                //Send status code 200 and json data
+                res.status(200).json({
+                    message: 'Handling POST requests to /create/',
+                    data: entry
+                });
+            })
+            .catch((error) => {
+                res.status(500).json({
+                    error: error
+                });
+            });
+    } else {
+        res.status(500).json({
+            error: 'Invalid criteria'
+        });
+    }
 };
 
 /******************************************************/
@@ -92,7 +131,9 @@ module.exports.update_by_id = async (req, res) => {
         archived: req.body.archived
     }
 
-    Entry.findByIdAndUpdate(req.params.id, new_data, {new: true}, (error, result) => {
+    // console.log(req.b);
+
+    Entry.findByIdAndUpdate(req.params.id, new_data, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'Invalid criteria' });
         if (result) return res.status(200).json({
             message: `Handling PUT requests to /update_by_id/${req.params.id}`,
@@ -103,52 +144,28 @@ module.exports.update_by_id = async (req, res) => {
 };
 
 //PUT requst for entrys by title
-module.exports.update_title = async (req, res) => {
-    // //Access date property
-    // const year = req.body.date.split(" ")[0];
-    // const initialDate = req.body.date;
-    // const initialMonth = req.body.date.split(" ")[2];
-    // const initialDay = req.body.date.split(" ")[4];
+module.exports.update_by_title = async (req, res) => {
+    //Format date into acceptable form
+    let date = req.body.date;
 
-    // let formatedDate = req.body.date;
-    // formatedDate = formatedDate.replace(/\s/g, '');
-    // formatedDate = dateFormat(formatedDate, 'dddd, mmmm, dS, yyyy');
-    // formatedDate = formatedDate.replace(/,/g, '');
-    // formatedDate = formatedDate.split(" ");
+    //Format Date
+    date = dateFormat(date, "dddd, mmmm, dS, yyyy");;
 
-    // const data = req.body;
-    // delete data.date;
+    //Convert formatedDate into array
+    date = date.split(', ');
 
-    // data.date = new Object();
-    // data.date.initial = new Object();
-    // data.date.formated = new Object();
+    const new_data = {
+        title: req.body.title,
+        author: req.body.author,
+        date: date,
+        time: req.body.time,
+        tags: req.body.tags,
+        type: req.body.type,
+        data: req.body.data,
+        archived: req.body.archived
+    }
 
-    // data.date.formated.day = new Object();
-    // data.date.formated.full = new Array();
-
-
-    // data.date.initial.full = initialDate;
-    // data.date.initial.month = initialMonth;
-    // data.date.initial.day = initialDay;
-
-    // data.date.formated.day.number = formatedDate[2];
-    // data.date.formated.day.string = formatedDate[0];
-
-    // data.date.formated.month = formatedDate[1];
-
-    // data.date.year = year;
-
-    // data.date.formated.full = formatedDate;
-
-    // console.log(req.params)
-
-    // Entry.findOneAndUpdate(req.params.title, data, { new: true }, (error, result) => {
-    //     if (error) return res.status(500).json({ error: 'error' });
-    //     if (result) return res.status(200).json({ message: `Handling PUT requests to /update_title/${req.params.title}`, data: result });
-    //     return res.status(404).json({ data: "Nothing is removed" });
-    // });
-
-    Entry.findOneAndUpdate(req.params.title, data, { new: true }, (error, result) => {
+    Entry.findOneAndUpdate(req.params.title, new_data, { new: true }, (error, result) => {
         if (error) return res.status(500).json({ error: 'error' });
         if (result) return res.status(200).json({ message: `Handling PUT requests to /update_title/${req.params.title}`, data: result });
         return res.status(404).json({ data: "Nothing is removed" });
@@ -196,29 +213,29 @@ module.exports.retrieve_amount = async (req, res) => {
             //Perform request
             Entry.countDocuments({}, await function (error, count) {
                 //Ensure no errors are present
-                if (error)  return res.status(500).json({error: 'Invalid criteria'});
+                if (error) return res.status(500).json({ error: 'Invalid criteria' });
                 //Send results
                 if (count || count === 0) return res.status(200).json({
                     message: `Handling GET requests to /get/retrieve/`,
                     data: count
                 });
                 //Send no removel message
-                return res.status(404).json({data: "Nothing is removed"});
+                return res.status(404).json({ data: "Nothing is removed" });
             });
         } else if (type >= 1 && type <= 3) {
             //Return select post type amounts
             if (type === type_blog || type === type_project || type === type_tutorial) {
                 //Perform request
-                Entry.countDocuments({type: type}, await function (error, count) {
+                Entry.countDocuments({ type: type }, await function (error, count) {
                     //Ensure no errors are present
-                    if (error)  return res.status(500).json({error: 'Invalid criteria'});
+                    if (error) return res.status(500).json({ error: 'Invalid criteria' });
                     //Send results
                     if (count || count === 0) return res.status(200).json({
                         message: `Handling GET requests to /get/retrieve/`,
                         data: `There is ${count} category ${type} post(s)`
                     });
                     //Send no removel message
-                    return res.status(404).json({data: "Nothing is removed"});
+                    return res.status(404).json({ data: "Nothing is removed" });
                 });
             }
         } else {
@@ -360,7 +377,7 @@ module.exports.retrieve_month = async (req, res) => {
             month = parseInt(month);
             //Ensure month is ranginf from 1 - 12
             if (month <= 12 && month >= 1) {
-                const data = await Entry.find({'date.initial.month': month}).exec();
+                const data = await Entry.find({ 'date.initial.month': month }).exec();
                 //Ensure no empty data is returned
                 if (data.length > 0) {
                     res.status(200).json({
@@ -381,14 +398,14 @@ module.exports.retrieve_month = async (req, res) => {
                 if (possible_months.hasOwnProperty(entry)) {
                     //Check matching month
                     if (month === possible_months[entry]) {
-                        valid_month = true; 
+                        valid_month = true;
                     }
                 }
             }
             //Perform request once month is validated
             if (valid_month) {
                 //Send request for search
-                const data = await Entry.find({'date.formated.month': month}).exec();
+                const data = await Entry.find({ 'date.formated.month': month }).exec();
                 //Ensure that valid data is present
                 if (data.length > 0) {
                     res.status(200).json({
@@ -440,7 +457,7 @@ module.exports.retrieve_day = async (req, res) => {
             //Handles days between the first and last day of each month
             if (day <= 31 && day >= 1) {
                 //Perform query for data
-                const data = await Entry.find({'date.initial.day': day}).exec();
+                const data = await Entry.find({ 'date.initial.day': day }).exec();
                 //Check that data does not return empty
                 if (data.length > 0) {
                     res.status(200).json({
@@ -467,7 +484,7 @@ module.exports.retrieve_day = async (req, res) => {
             //Perform request once day is validated
             if (valid_day) {
                 //Send request for search
-                const data = await Entry.find({'date.formated.day.string': day}).exec();
+                const data = await Entry.find({ 'date.formated.day.string': day }).exec();
                 //Ensure that valid data is present
                 if (data.length > 0) {
                     res.status(200).json({
@@ -498,16 +515,18 @@ module.exports.retrieve_type = async (req, res) => {
     //Retrieve only documents matching the specified TYPE
     try {
         const type = parseInt(req.params.type);
-        const type_blog = 1;
-        const type_project = 2;
-        const type_tutorial = 3;
+        const type_blog = 'blog';
+        const type_project = 'project';
+        const type_tutorial = 'tutorial';
+
+        console.log(req.body.type);
 
         //Check for any errors
         let error = false;
 
         //Check valid type is submitted
         if (type === type_blog || type === type_project || type === type_tutorial) {
-            const data = await Entry.find({type: req.params.type}).exec();
+            const data = await Entry.find({ type: req.params.type }).exec();
             if (data.length > 0) {
                 res.status(200).json({
                     message: `Handling GET requests to /get/retrieve_type/${req.params.type}`,
@@ -557,15 +576,15 @@ module.exports.retrieve_tag = async (req, res) => {
 
 //DELETE request for all
 module.exports.remove = async (req, res) => {
-    //Remove all documents from DB
-    Entry.remove((error, result) => {
-        if (error) return res.status(500).json({ error: 'error' });
-        if (result) return res.status(200).json({
-            message: 'Handling DELETE requests to /remove/',
+    //Remove all documents in DB
+    Entry.deleteMany({}, (error, result) => {
+        if (error) return res.status(500).json({ error: 'Invalid criteria' });
+        if (result.n) return res.status(200).json({
+            message: `Handling DELETE requests to /remove_title/remove`,
             data: `Removed ${result.n} post(s)`
         });
         return res.status(404).json({ data: "Nothing is removed" });
-    })
+    });
 };
 
 //DELETE request for entrys by id
@@ -585,8 +604,7 @@ module.exports.remove_id = async (req, res) => {
 //DELETE request for entrys by title
 module.exports.remove_title = async (req, res) => {
     //Remove all documents matching the specifed title
-    Entry.deleteMany({title: req.params.title}, (error, result) => {
-        console.log(result);
+    Entry.deleteMany({ title: req.params.title }, (error, result) => {
         if (error) return res.status(500).json({ error: 'Invalid criteria' });
         if (result.n) return res.status(200).json({
             message: `Handling DELETE requests to /remove_title/${req.params.title}`,
@@ -599,8 +617,7 @@ module.exports.remove_title = async (req, res) => {
 //DELETE request for entrys by author
 module.exports.remove_author = (req, res) => {
     //Remove all documents matching the specifed author
-    Entry.deleteMany({author: req.params.author}, (error, result) => {
-        console.log(result);
+    Entry.deleteMany({ author: req.params.author }, (error, result) => {
         if (error) return res.status(500).json({ error: 'Invalid criteria' });
         if (result.n) return res.status(200).json({
             message: `Handling DELETE requests to /remove_title/${req.params.title}`,
